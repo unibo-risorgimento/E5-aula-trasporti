@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aula</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    /* Forza il font su TUTTI gli elementi (anche button su iOS) */
+    :root{
+      --font: Calibri, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    }
+    html, body, button, input, select, textarea, a, p, h1, h2, h3, h4, h5, h6, span, div{
+      font-family: var(--font);
+    }
+    button, input, select, textarea{
+      font: inherit; /* evita font “di default” del browser */
+    }
+
+    body{
+      margin:0;
+      background:#6b6b6b;
+      padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+    }
+
+    .frame{
+      width: min(520px, 100%);
+      margin: 24px auto;
+      background:#fff;
+      padding: 22px 18px 28px;
+      border-radius: 10px;
+    }
+
+    /* header: logo centrato, lingua in alto a dx */
+    .top{
+      position: relative;
+      text-align: center;
+      padding-top: 6px;
+    }
+
+    .logo{
+      width: min(280px, 68vw); /* PIÙ PICCOLO */
+      height: auto;
+      max-width: 100%;
+      display:block;
+      margin: 10px auto 0;
+    }
+
+    .lang{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background:#b3261e;
+      color:#fff;
+      border:0;
+      width: 52px;
+      height: 52px;
+      font-weight:700;
+      cursor:pointer;
+      border-radius: 12px;
+    }
+
+    h1{
+      text-align:center;
+      font-size: clamp(26px, 7vw, 36px);
+      margin: 14px 0 18px;
+      font-weight:600;
+      line-height: 1.15;
+    }
+
+    .btn{
+      display:block;
+      width:100%;
+      text-align:center;
+      text-decoration:none;
+      background:#b3261e;
+      color:#fff;
+      padding: clamp(18px, 5vw, 26px) clamp(14px, 4vw, 18px);
+      font-size: clamp(22px, 6vw, 34px);
+      margin: 16px 0;
+      border-radius: 12px;
+      line-height: 1.1;
+      font-family: var(--font); /* extra-sicurezza */
+    }
+
+    @media (max-width: 480px){
+      .frame{
+        margin: 0;
+        min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        border-radius: 0;
+        padding: 18px 16px 24px;
+      }
+      .lang{
+        top: 8px;
+        right: 8px;
+        width: 50px;
+        height: 50px;
+      }
+      .logo{
+        width: min(260px, 72vw); /* leggermente più piccolo su mobile */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="frame">
+    <div class="top">
+      <img class="logo" src="unibo-logo-big.png" alt="Alma Mater Studiorum – Università di Bologna" />
+      <button class="lang" id="langBtn">EN</button>
+    </div>
+
+    <h1 id="roomTitle">Aula 8.1</h1>
+
+    <a class="btn" id="mapBtn" href="#" target="_blank" rel="noopener">Mappa</a>
+    <a class="btn" id="reportBtn" href="#" target="_blank" rel="noopener">Segnalazioni</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const room = params.get("room") || "8.1";
+    let lang = params.get("lang") || "it";
+
+    const strings = {
+      it: { title: `Aula ${room}`, map: "Mappa", report: "Segnalazioni", langBtn: "EN" },
+      en: { title: `Room ${room}`, map: "Map", report: "Reports", langBtn: "IT" }
+    };
+
+    const MAP_URL = "https://app.mappedin.com/map/681891b804e97f000b1e1311?floor=m_35535e2991bb8279&location=s_b514bb8f163be7cf";
+    const REPORT_BASE = "https://qr.unibo.it/locale/dzdTLzZ6N2JnYjNLQnhnYkkzNmlZZz09";
+
+    function render() {
+      document.documentElement.lang = lang;
+      document.getElementById("roomTitle").textContent = strings[lang].title;
+      document.getElementById("mapBtn").textContent = strings[lang].map;
+      document.getElementById("reportBtn").textContent = strings[lang].report;
+      document.getElementById("langBtn").textContent = strings[lang].langBtn;
+
+      document.getElementById("mapBtn").href = MAP_URL;
+      document.getElementById("reportBtn").href =
+        `${REPORT_BASE}?room=${encodeURIComponent(room)}&lang=${lang}`;
+    }
+
+    document.getElementById("langBtn").addEventListener("click", () => {
+      lang = (lang === "it") ? "en" : "it";
+      params.set("lang", lang);
+      history.replaceState({}, "", `${location.pathname}?${params.toString()}`);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
